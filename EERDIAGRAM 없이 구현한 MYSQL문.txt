@@ -1,0 +1,303 @@
+DROP DATABASE IF EXISTS  madang;
+DROP USER IF EXISTS  madang@localhost;
+
+create user madang@localhost identified WITH mysql_native_password  by 'madang';
+create database madang;
+grant all privileges on madang.* to madang@localhost with grant option;
+commit;
+
+USE madang;
+
+create table movie_info (
+   movie_id integer,
+    movie_name varchar(20),
+    movie_time integer,
+    movie_age integer,
+    director_name varchar(20),
+    actor_name varchar(20),
+    genre varchar(10),
+    movie_intro varchar(30),
+    release_date varchar(8)
+);
+
+ALTER TABLE movie_info
+  ADD CONSTRAINT movie_id_pk PRIMARY KEY (movie_id);
+  
+create table theater_info (
+   theater_id       integer,
+    seat_count      integer,
+    theater_use_check   varchar(1)
+);
+
+ALTER TABLE theater_info
+  ADD CONSTRAINT theater_id_pk PRIMARY KEY (theater_id);
+
+create table screening_date_info (
+   schedule_id integer,
+    movie_id integer,
+    theater_id integer,
+    screening_start_date varchar(8),
+    screening_day varchar(3),
+    screening_session integer,
+    screening_start_time varchar(4)
+);
+
+ALTER TABLE screening_date_info
+  ADD CONSTRAINT schedule_id_pk PRIMARY KEY (schedule_id);
+
+ALTER TABLE screening_date_info
+  ADD (CONSTRAINT R_2 FOREIGN KEY (movie_id) REFERENCES movie_info (movie_id));
+
+ALTER TABLE screening_date_info
+  ADD (CONSTRAINT R_3 FOREIGN KEY (theater_id) REFERENCES theater_info (theater_id));
+
+create table seat_info (
+   seat_id            integer,
+   schedule_id 			integer,
+    theater_id         integer,
+    seat_check         varchar(1)
+);
+
+ALTER TABLE seat_info
+  ADD CONSTRAINT seat_schedule_id_pk PRIMARY KEY (seat_id, schedule_id);
+
+ALTER TABLE seat_info
+  ADD (CONSTRAINT R_10 FOREIGN KEY (schedule_id) REFERENCES screening_date_info (schedule_id));
+
+ALTER TABLE seat_info
+  ADD (CONSTRAINT R_4 FOREIGN KEY (theater_id) REFERENCES theater_info (theater_id));
+
+create table client_info (
+   client_id      integer,
+    client_name      varchar(3),
+    phone_number         varchar(10),
+    email      varchar(50)
+);
+
+ALTER TABLE client_info
+  ADD CONSTRAINT client_id_pk PRIMARY KEY (client_id);
+
+create table book_info (
+   book_id  integer AUTO_INCREMENT PRIMARY KEY,
+    payment_method   varchar(4),
+    payment_check   varchar(1),
+    payment_amount   integer,
+    client_id      integer,
+    book_date varchar(8)
+);
+
+ALTER TABLE book_info
+  ADD (CONSTRAINT R_5 FOREIGN KEY (client_id) REFERENCES client_info (client_id));
+
+create table ticket_info (
+   ticket_id            integer,
+    schedule_id   integer,
+    theater_id   integer,
+    seat_id               integer,
+    book_id               integer,
+    issuance_check            varchar(1),
+    standard_price         integer,
+    selling_price         integer
+);
+
+ALTER TABLE ticket_info
+  ADD CONSTRAINT ticket_id_pk PRIMARY KEY (ticket_id);
+
+ALTER TABLE ticket_info
+  ADD (CONSTRAINT R_6 FOREIGN KEY (schedule_id) REFERENCES screening_date_info (schedule_id));
+
+ALTER TABLE ticket_info
+  ADD (CONSTRAINT R_7 FOREIGN KEY (theater_id) REFERENCES theater_info (theater_id));
+
+ALTER TABLE ticket_info
+  ADD (CONSTRAINT R_8 FOREIGN KEY (seat_id) REFERENCES seat_info (seat_id));
+
+ALTER TABLE ticket_info
+  ADD (CONSTRAINT R_9 FOREIGN KEY (book_id) REFERENCES book_info (book_id));
+
+insert into movie_info values(1, "범죄도시2", 106, 15, "이상용", "마동석", "범죄", "인기배우 마동석의 범죄액션영화", "20210118");
+insert into movie_info values(2, "닥터스트레인지2", 126, 12, "샘 레이미", "베네딕트 컵버배치", "판타지", "마블영화", "20210204");
+insert into movie_info values(3, "스파이더맨", 148, 12, "존 왓츠", "톰 홀랜드", "판타지", "마블영화", "20210329");
+insert into movie_info values(4, "블랙위도우", 134, 12, "케이트 쇼트랜드", "스칼릿 조핸슨", "애니메이션", "인기 애니메이션 극장판", "20210412");
+insert into movie_info values(5, "귀멸의칼날", 117, 15, "소토자키 하루오", "이경태", "애니메이션", "마블영화", "20210501");
+insert into movie_info values(6, "베놈2", 97, 15, "앤디 서키스", "톰 하디", "판타지", "마블영화", "20210624");
+insert into movie_info values(7, "크루엘라", 133, 12, "크레이그 질레스피", "엠마 스톤", "드라마", "관객들의 대호평작", "20210705");
+insert into movie_info values(8, "반도", 116, 15, "연상호", "강동원", "액션", "흥행작 부산행의 후속작", "20210801");
+insert into movie_info values(9, "극한직업", 111, 15, "이병헌", "류승룡", "코미디", "한국의 인기 코미디 영화", "20210927");
+insert into movie_info values(10, "겨울왕국2", 103, 0, "크리스 벅", "크리스틴 벨", "애니메이션", "디즈니 애니메이션", "20211030");
+
+insert into theater_info values(1, 3, "O");
+insert into theater_info values(2, 2, "O");
+insert into theater_info values(3, 4, "O");
+insert into theater_info values(4, 2, "O");
+insert into theater_info values(5, 5, "O");
+insert into theater_info values(6, 2, "O");
+insert into theater_info values(7, 3, "O");
+insert into theater_info values(8, 4, "O");
+insert into theater_info values(9, 2, "O");
+insert into theater_info values(10, 3, "O");
+
+insert into screening_date_info values(1, 9, 1, "20220427", "수요일", 1, "0700");
+insert into screening_date_info values(2, 3, 2, "20220429", "금요일", 1, "0655");
+insert into screening_date_info values(3, 8, 3, "20220501", "수요일", 1, "0720");
+insert into screening_date_info values(4, 2, 4, "20220504", "토요일", 1, "1120");
+insert into screening_date_info values(5, 7, 5, "20220505", "일요일", 1, "0830");
+insert into screening_date_info values(6, 4, 6, "20220512", "일요일", 1, "1000");
+insert into screening_date_info values(7, 1, 7, "20220518", "토요일", 1, "0940");
+insert into screening_date_info values(8, 6, 8, "20220524", "금요일", 1, "0725");
+insert into screening_date_info values(9, 10, 9, "20220530", "목요일", 1, "1230");
+insert into screening_date_info values(10, 5, 10, "20220601", "수요일", 1, "1200");
+insert into screening_date_info values(11, 9, 1, "20220428", "목요일", 2, "0700");
+insert into screening_date_info values(12, 3, 2, "20220430", "토요일", 2, "0655");
+insert into screening_date_info values(13, 8, 3, "20220502", "목요일", 2, "0720");
+insert into screening_date_info values(14, 2, 4, "20220505", "일요일", 2, "1120");
+insert into screening_date_info values(15, 7, 5, "20220506", "월요일", 2, "0830");
+insert into screening_date_info values(16, 4, 6, "20220513", "월요일", 2, "1000");
+insert into screening_date_info values(17, 1, 7, "20220519", "일요일", 2, "0940");
+insert into screening_date_info values(18, 6, 8, "20220525", "토요일", 2, "0725");
+insert into screening_date_info values(19, 10, 9, "20220531", "금요일", 2, "1230");
+insert into screening_date_info values(20, 5, 10, "20220602", "목요일", 2, "1200");
+
+insert into seat_info values(1, 1, 1, "X");
+insert into seat_info values(2, 1, 1, "O");
+insert into seat_info values(3, 1, 1, "X");
+insert into seat_info values(4, 2, 2, "X");
+insert into seat_info values(5, 2, 2, "X");
+insert into seat_info values(6, 3, 3, "O");
+insert into seat_info values(7, 3, 3, "X");
+insert into seat_info values(8, 3, 3, "X");
+insert into seat_info values(9, 3, 3, "X");
+insert into seat_info values(10, 4, 4, "X");
+insert into seat_info values(11, 4, 4, "X");
+insert into seat_info values(12, 5, 5, "O");
+insert into seat_info values(13, 5, 5, "O");
+insert into seat_info values(14, 5, 5, "O");
+insert into seat_info values(15, 5, 5, "X");
+insert into seat_info values(16, 5, 5, "X");
+insert into seat_info values(17, 6, 6, "X");
+insert into seat_info values(18, 6, 6, "O");
+insert into seat_info values(19, 7, 7, "X");
+insert into seat_info values(20, 7, 7, "O");
+insert into seat_info values(21, 7, 7, "X");
+insert into seat_info values(22, 8, 8, "X");
+insert into seat_info values(23, 8, 8, "O");
+insert into seat_info values(24, 8, 8, "O");
+insert into seat_info values(25, 8, 8, "X");
+insert into seat_info values(26, 9, 9, "X");
+insert into seat_info values(27, 9, 9, "X");
+insert into seat_info values(28, 10, 10, "X");
+insert into seat_info values(29, 10, 10, "X");
+insert into seat_info values(30, 10, 10, "O");
+insert into seat_info values(1, 11, 1, "X");
+insert into seat_info values(2, 11, 1, "X");
+insert into seat_info values(3, 11, 1, "X");
+insert into seat_info values(4, 12, 2, "X");
+insert into seat_info values(5, 12, 2, "X");
+insert into seat_info values(6, 13, 3, "X");
+insert into seat_info values(7, 13, 3, "X");
+insert into seat_info values(8, 13, 3, "X");
+insert into seat_info values(9, 13, 3, "X");
+insert into seat_info values(10, 14, 4, "X");
+insert into seat_info values(11, 14, 4, "X");
+insert into seat_info values(12, 15, 5, "X");
+insert into seat_info values(13, 15, 5, "X");
+insert into seat_info values(14, 15, 5, "X");
+insert into seat_info values(15, 15, 5, "X");
+insert into seat_info values(16, 15, 5, "X");
+insert into seat_info values(17, 16, 6, "X");
+insert into seat_info values(18, 16, 6, "X");
+insert into seat_info values(19, 17, 7, "X");
+insert into seat_info values(20, 17, 7, "X");
+insert into seat_info values(21, 17, 7, "X");
+insert into seat_info values(22, 18, 8, "X");
+insert into seat_info values(23, 18, 8, "X");
+insert into seat_info values(24, 18, 8, "X");
+insert into seat_info values(25, 18, 8, "X");
+insert into seat_info values(26, 19, 9, "X");
+insert into seat_info values(27, 19, 9, "X");
+insert into seat_info values(28, 20, 10, "X");
+insert into seat_info values(29, 20, 10, "X");
+insert into seat_info values(30, 20, 10, "X");
+ 
+ insert into client_info values(1, "이예원", "9246512344","Yewon142@gmail.com");
+ insert into client_info values(2, "김민섭", "7223545567","minseop77@gmail.com");
+ insert into client_info values(3, "김하영", "5577547713","hayeong9975@gmail.com");
+ insert into client_info values(4, "신민재", "9943564894", "minjae1541@gmail.com");
+ insert into client_info values(5, "김창준", "4563315488", "changjun32@gmail.com");
+ insert into client_info values(6, "윤지원", "8998468565", "jiwon824@gmail.com");
+ insert into client_info values(7, "김진호", "8798746564", "jinho9292@gmail.com");
+ insert into client_info values(8, "박준재", "1215665448", "junjae28@gmail.com");
+ insert into client_info values(9, "안해인", "4654651231", "haein0234@gmail.com");
+ insert into client_info values(10, "이지현", "8798454646", "jihyeon0808@gmail.com");
+
+ insert into book_info values(1, "카드", "O", 14000, 10, "20220320");
+ insert into book_info values(2, "카드", "O", 14000, 7, "20220305");
+ insert into book_info values(3, "휴대폰", "O", 14000, 8, "20220307");
+ insert into book_info values(4, "카드", "O", 14000, 1, "20220313");
+ insert into book_info values(5, "카드", "O", 14000, 4, "20220311");
+ insert into book_info values(6, "현장결제", "O", 14000, 2, "20220320");
+ insert into book_info values(7, "카드", "O", 14000, 9, "20220320");
+ insert into book_info values(8, "카드", "O", 14000, 6, "20220306");
+ insert into book_info values(9, "카드", "O", 14000, 3, "20220304");
+ insert into book_info values(10, "휴대폰", "O", 14000, 5, "20220317");
+
+insert into ticket_info values(1, 1, 1, 1, NULL, "X", 14000, 14000);
+insert into ticket_info values(2, 1, 1, 2, 4, "O", 14000, 14000);
+insert into ticket_info values(3, 1, 1, 3, NULL, "X", 14000, 14000);
+insert into ticket_info values(4, 2, 2, 4, NULL, "X", 14000, 14000);
+insert into ticket_info values(5, 2, 2, 5, NULL, "X", 14000, 14000);
+insert into ticket_info values(6, 3, 3, 6, 10, "O", 14000, 14000);
+insert into ticket_info values(7, 3, 3, 7, NULL, "X", 14000, 14000);
+insert into ticket_info values(8, 3, 3, 8, NULL, "X", 14000, 14000);
+insert into ticket_info values(9, 3, 3, 9, NULL, "X", 14000, 14000);
+insert into ticket_info values(10, 4, 4, 10, NULL, "X", 14000, 14000);
+insert into ticket_info values(11, 4, 4, 11, NULL, "X", 14000, 14000);
+insert into ticket_info values(12, 5, 5, 12, 3, "O", 14000, 14000);
+insert into ticket_info values(13, 5, 5, 13, 7, "O", 14000, 14000);
+insert into ticket_info values(14, 5, 5, 14, 8, "O", 14000, 14000);
+insert into ticket_info values(15, 5, 5, 15, NULL, "X", 14000, 14000);
+insert into ticket_info values(16, 5, 5, 16, NULL, "X", 14000, 14000);
+insert into ticket_info values(17, 6, 6, 17, NULL, "X", 14000, 14000);
+insert into ticket_info values(18, 6, 6, 18, 1, "O", 14000, 14000);
+insert into ticket_info values(19, 7, 7, 19, NULL, "X", 14000, 14000);
+insert into ticket_info values(20, 7, 7, 20, 6, "O", 14000, 14000);
+insert into ticket_info values(21, 7, 7, 21, NULL, "X", 14000, 14000);
+insert into ticket_info values(22, 8, 8, 22, NULL, "X", 14000, 14000);
+insert into ticket_info values(23, 8, 8, 23, 2, "O", 14000, 14000);
+insert into ticket_info values(24, 8, 8, 24, 9, "O", 14000, 14000);
+insert into ticket_info values(25, 8, 8, 25, NULL, "X", 14000, 14000);
+insert into ticket_info values(26, 9, 9, 26, NULL, "X", 14000, 14000);
+insert into ticket_info values(27, 9, 9, 27, NULL, "X", 14000, 14000);
+insert into ticket_info values(28, 10, 10, 28, NULL, "X", 14000, 14000);
+insert into ticket_info values(29, 10, 10, 29, NULL, "X", 14000, 14000);
+insert into ticket_info values(30, 10, 10, 30, 5, "O", 14000, 14000);
+insert into ticket_info values(31, 11, 1, 1, NULL, "X", 14000, 14000);
+insert into ticket_info values(32, 11, 1, 2, NULL, "X", 14000, 14000);
+insert into ticket_info values(33, 11, 1, 3, NULL, "X", 14000, 14000);
+insert into ticket_info values(34, 12, 2, 4, NULL, "X", 14000, 14000);
+insert into ticket_info values(35, 12, 2, 5, NULL, "X", 14000, 14000);
+insert into ticket_info values(36, 13, 3, 6, NULL, "X", 14000, 14000);
+insert into ticket_info values(37, 13, 3, 7, NULL, "X", 14000, 14000);
+insert into ticket_info values(38, 13, 3, 8, NULL, "X", 14000, 14000);
+insert into ticket_info values(39, 13, 3, 9, NULL, "X", 14000, 14000);
+insert into ticket_info values(40, 14, 4, 10, NULL, "X", 14000, 14000);
+insert into ticket_info values(41, 14, 4, 11, NULL, "X", 14000, 14000);
+insert into ticket_info values(42, 15, 5, 12, NULL, "X", 14000, 14000);
+insert into ticket_info values(43, 15, 5, 13, NULL, "X", 14000, 14000);
+insert into ticket_info values(44, 15, 5, 14, NULL, "X", 14000, 14000);
+insert into ticket_info values(45, 15, 5, 15, NULL, "X", 14000, 14000);
+insert into ticket_info values(46, 15, 5, 16, NULL, "X", 14000, 14000);
+insert into ticket_info values(47, 16, 6, 17, NULL, "X", 14000, 14000);
+insert into ticket_info values(48, 16, 6, 18, NULL, "X", 14000, 14000);
+insert into ticket_info values(49, 17, 7, 19, NULL, "X", 14000, 14000);
+insert into ticket_info values(50, 17, 7, 20, NULL, "X", 14000, 14000);
+insert into ticket_info values(51, 17, 7, 21, NULL, "X", 14000, 14000);
+insert into ticket_info values(52, 18, 8, 22, NULL, "X", 14000, 14000);
+insert into ticket_info values(53, 18, 8, 23, NULL, "X", 14000, 14000);
+insert into ticket_info values(54, 18, 8, 24, NULL, "X", 14000, 14000);
+insert into ticket_info values(55, 18, 8, 25, NULL, "X", 14000, 14000);
+insert into ticket_info values(56, 19, 9, 26, NULL, "X", 14000, 14000);
+insert into ticket_info values(57, 19, 9, 27, NULL, "X", 14000, 14000);
+insert into ticket_info values(58, 20, 10, 28, NULL, "X", 14000, 14000);
+insert into ticket_info values(59, 20, 10, 29, NULL, "X", 14000, 14000);
+insert into ticket_info values(60, 20, 10, 30, NULL, "X", 14000, 14000);
